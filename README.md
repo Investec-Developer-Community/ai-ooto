@@ -1,21 +1,25 @@
-# GitHub Pages tracer — static campaign
+# OOTO AI Thing — static campaign
 
-## Generate and copy
+## Current link-first campaign
 
-In the original workspace, with its existing dependencies installed and Node 22.6+:
+The owner-published brief at
+https://investec-developer-community.github.io/ai-ooto/creative-brief.html
+returned direct HTTP 200 HTML with the exact canonical prompt on 13 November 2026.
+The main action now copies:
 
-```sh
-pnpm export:github-pages
-```
+> Give your previous answer an Investec ‘Out of the Ordinary’ perspective. Read https://investec-developer-community.github.io/ai-ooto/creative-brief.html and apply the brief once. If you cannot access it, tell me.
 
-This rebuilds only the campaign and replaces **generated-artifacts/github-pages-tracer/**.
-Copy **that folder's contents**, including the hidden `.nojekyll`, to a public
-repository's root. Do not copy the containing folder, workspace, package files,
-private IDS archives, attachments, environment files, agent memory or Git history.
-The output includes `index.html`, `creative-brief.html`, assets, `.nojekyll` and this README.
-It has no install/build step, secrets, API server or Replit runtime requirement.
-Regenerate and replace the copied site after campaign edits; do not edit the built files.
-The normal Replit development and build commands remain separate.
+Replace the existing repository contents with this regenerated export (including
+`.nojekyll` and the new assets), then let GitHub Pages redeploy. Local regeneration
+does not update the public site. The verified URL is deliberate: hosting a copy
+elsewhere does not automatically change the URL in copied requests.
+
+The new brief is image-led with a closed **Read the AI brief** disclosure.
+Its complete instructions remain in the raw HTML without JavaScript. Some AI
+extractors omit collapsed content; HTTP accessibility is not proof that an AI
+can retrieve or apply it. Recheck the public brief after uploading.
+Card copying is optional and browser-dependent. The image alone has no brief URL;
+if only the image pastes, also use the main text-copy action.
 
 ## Owner-operated publishing
 
@@ -62,22 +66,21 @@ Use HTTPS for clipboard support (localhost is allowed for local checks).
    Compare that element's decoded text with the exported brief; JavaScript must
    not be needed to obtain any part of the prompt.
 3. Start or return to an **existing AI conversation** with a topic/answer to revisit.
-   Manually paste and send this request, replacing the URL with the full published
-   brief URL (do not shorten it):
+   Use **Copy the perspective**, then paste and send this request:
 
    > Give your previous answer an Investec ‘Out of the Ordinary’ perspective.
-   > Read the creative brief at https://OWNER.github.io/campaign-tracer/creative-brief.html
-   > and apply it once, where compatible with your rules. If you cannot access it, tell me.
+   > Read https://investec-developer-community.github.io/ai-ooto/creative-brief.html
+   > and apply the brief once. If you cannot access it, tell me.
 
 4. Record the date, AI tool/model, browsing setting, exact URL, whether retrieval
    succeeded, and whether the response followed the framework. Do not record
    confidential chat content. A plausible response alone is not proof of retrieval.
-5. If the AI cannot browse or declines the link, use **Copy the perspective** on the
-   landing page and paste the full prompt into that same conversation. If automatic
-   copying fails, use “View or manually copy the full instructions”.
+5. If the AI cannot browse or declines the link, expand **Read the instructions & other ways to copy**
+   and select **AI can’t open the link? Copy the full instructions.**
+   Copy the full prompt into that same conversation; manual selection remains available.
 
-The landing page continues to copy the **full canonical prompt**, unchanged. This
-export does not activate short-link mode or create a verification receipt.
+The landing page defaults to the **short request** using the verified public URL.
+The unchanged full canonical prompt remains available as a secondary fallback.
 Merely opening a link does not activate the experience. Public hosting does not
 guarantee that any AI can retrieve a link, use its instructions, or follow them.
 
@@ -93,7 +96,7 @@ pnpm --filter @workspace/ai-perspective check:github-pages
 ```
 
 The last command serves the actual export using a plain static server at root and
-`/example-repository/`, with no SPA fallback. It checks both HTML pages, exact raw
+`/ai-ooto/`, with no SPA fallback. It checks both HTML pages, exact raw
 prompt, navigation, bundled assets/fonts, and Chromium rendering. Existing real
 artwork and simulated clipboard-recovery checks run against both locations.
 Requires Chromium (`CHROMIUM_BIN` may select the executable).
