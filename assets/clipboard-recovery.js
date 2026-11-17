@@ -6,7 +6,7 @@
   if (!isTouchDevice) return;
 
   const SHORT_REQUEST =
-    "Visit https://investec-developer-community.github.io/ai-ooto/creative-brief.html and tap out of the ordinary.";
+    "Give this conversation an Out of the Ordinary perspective. Read and apply the instructions at: https://investec-developer-community.github.io/ai-ooto/creative-brief.html";
   const cardFilePromise = fetch(new URL("./investec-card.png", window.location.href), {
     credentials: "same-origin",
   }).then(async (response) => {
