@@ -5,6 +5,8 @@
 
   if (!isTouchDevice) return;
 
+  const SHORT_REQUEST =
+    "Visit https://investec-developer-community.github.io/ai-ooto/creative-brief.html and tap out of the ordinary.";
   let copying = false;
 
   function announce(message) {
@@ -15,12 +17,6 @@
   function findCardCopyButton(target) {
     const button = target instanceof Element ? target.closest("button") : null;
     return button?.textContent?.trim().startsWith("Copy card +") ? button : null;
-  }
-
-  function getPrompt() {
-    const prompt = document.querySelector(".prompt-pre")?.textContent?.trim();
-    if (!prompt) throw new Error("The copy instructions are unavailable.");
-    return prompt;
   }
 
   function hasRichClipboardSupport() {
@@ -64,60 +60,6 @@
     }
   }
 
-  async function copyCardAndPrompt(text) {
-    const clipboard = navigator.clipboard;
-    const ClipboardItemConstructor = window.ClipboardItem;
-    if (
-      !window.isSecureContext ||
-      typeof clipboard?.write !== "function" ||
-      typeof ClipboardItemConstructor !== "function"
-    ) {
-      throw new Error("Combined image and text copying is not supported.");
-    }
-
-    if (
-      typeof ClipboardItemConstructor.supports === "function" &&
-      (!ClipboardItemConstructor.supports("image/png") ||
-        !ClipboardItemConstructor.supports("text/html"))
-    ) {
-      throw new Error("Combined image and text copying is not supported.");
-    }
-
-    const imageUrl = new URL("./investec-card.png", window.location.href);
-    const image = fetch(imageUrl, { credentials: "same-origin" }).then(
-      async (response) => {
-        if (!response.ok) throw new Error("The campaign card could not be loaded.");
-        const blob = await response.blob();
-        return blob.type === "image/png"
-          ? blob
-          : new Blob([blob], { type: "image/png" });
-      },
-    );
-    image.catch(() => {});
-    const escapedUrl = imageUrl.href.replaceAll("&", "&amp;").replaceAll('"', "&quot;");
-    const escapedPrompt = text
-      .replaceAll("&", "&amp;")
-      .replaceAll("<", "&lt;")
-      .replaceAll(">", "&gt;")
-      .replaceAll('"', "&quot;")
-      .replaceAll("'", "&#39;");
-    const html = [
-      "<div>",
-      `<p><img src="${escapedUrl}" alt="Investec Out of the Ordinary campaign card" width="240"></p>`,
-      `<p><strong>Investec — Out of the Ordinary AI perspective.</strong> ${escapedPrompt}</p>`,
-      `<pre style="white-space:pre-wrap">${escapedPrompt}</pre>`,
-      "</div>",
-    ].join("");
-
-    await clipboard.write([
-      new ClipboardItemConstructor({
-        "text/plain": new Blob([text], { type: "text/plain" }),
-        "text/html": new Blob([html], { type: "text/html" }),
-        "image/png": image,
-      }),
-    ]);
-  }
-
   document.addEventListener(
     "click",
     (event) => {
@@ -131,28 +73,15 @@
       button.setAttribute("aria-busy", "true");
 
       void (async () => {
-        let prompt;
         try {
-          prompt = getPrompt();
-          await copyCardAndPrompt(prompt);
+          await copyText(SHORT_REQUEST);
           announce(
-            "The card and request were copied. Some apps paste only one format; if needed, use Copy the perspective for text and attach the downloaded card separately.",
+            "The short request was copied. Download the card image and attach it separately in your AI chat.",
           );
         } catch {
-          if (!prompt) {
-            announce("The request text is unavailable. Use the main copy option or read the instructions manually.");
-          } else {
-            try {
-              await copyText(prompt);
-              announce(
-                "The combined copy was unavailable, so the request text was copied instead. Download the card image and attach it separately.",
-              );
-            } catch {
-              announce(
-                "The combined copy and automatic text copy both failed. Use Copy the perspective or select the instructions manually; download the card separately.",
-              );
-            }
-          }
+          announce(
+            "The request could not be copied. Use Copy the perspective, or open the instructions to copy it manually; attach the downloaded card separately.",
+          );
         } finally {
           copying = false;
           button.disabled = false;
