@@ -53,12 +53,8 @@ figcaption span{display:block;max-width:36ch;font-size:12px;line-height:1.6;colo
 .terms{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:clamp(20px,4vw,56px);border-top:1px solid var(--ids-color-border-default);padding-block:28px}
 .terms h2{margin:0 0 8px;font-size:11px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--ref-amber-ink)}
 .terms p{margin:0;font-size:13px;line-height:1.7;color:var(--ids-color-text-subtle)}
-details{border-block:1px solid var(--ids-color-border-default);margin-bottom:clamp(40px,6vw,72px)}
-summary{display:flex;align-items:center;justify-content:space-between;gap:16px;min-height:64px;cursor:pointer;list-style:none;font-family:var(--serif);font-size:clamp(20px,2.2vw,26px);letter-spacing:-.015em}
-summary::-webkit-details-marker{display:none}
-summary::after{content:"+";font-family:var(--sans);font-size:22px;color:var(--ref-amber-ink);transition:transform .3s var(--ease)}
-details[open] summary::after{transform:rotate(45deg)}
-summary small{display:block;font-family:var(--sans);font-size:12px;letter-spacing:0;color:var(--ids-color-text-subtle)}
+.brief{border-block:1px solid var(--ids-color-border-default);margin-bottom:clamp(40px,6vw,72px);padding-top:20px}
+.brief-title{margin:0 0 8px;font-family:var(--serif);font-size:clamp(20px,2.2vw,26px);font-weight:400;letter-spacing:-.015em}
 .brief-note{margin:4px 0 16px;font-size:13px;line-height:1.7;color:var(--ids-color-text-subtle);max-width:70ch}
 pre{margin:0 0 28px;padding:clamp(18px,3vw,32px);background:#fff8ef;border-left:2px solid var(--ref-amber);white-space:pre-wrap;overflow-wrap:anywhere;font:14px/1.7 var(--sans);color:var(--ref-slate)}
 footer{display:flex;justify-content:space-between;align-items:center;gap:24px;padding-block:22px;border-top:1px solid var(--ids-color-border-default);font-size:11px;color:var(--ids-color-text-subtle)}
@@ -106,11 +102,48 @@ footer span:first-child{font-family:var(--serif);font-size:15px;color:var(--ref-
     <div><h2>Privacy</h2><p>POC — not financial advice. This page does not read your clipboard or collect your conversation. It runs no scripts.</p></div>
   </section>
 
-  <details id="brief">
-    <summary><span>Read the AI brief<small>The full, unaltered creative framework</small></span></summary>
-    <p class="brief-note">The complete instructions are included in this page’s HTML. Some AI readers may omit collapsed content; use the full-instruction copy option on the campaign page if your AI cannot read this brief.</p>
-    <pre id="campaign-instructions">Give this conversation an Out of the Ordinary perspective. Read and apply the instructions at: https://investec-developer-community.github.io/ai-ooto/creative-brief.html</pre>
-  </details>
+  <section class="brief" id="brief" aria-labelledby="brief-title">
+    <h2 class="brief-title" id="brief-title">Out of the Ordinary AI framework</h2>
+    <p class="brief-note">The complete framework is shown below. To use it, copy the instructions into your AI conversation and send them with the topic or answer you want considered.</p>
+    <pre id="campaign-instructions">INVESTEC — OUT OF THE ORDINARY AI EXPERIENCE
+
+By pasting and sending this message, I am explicitly asking for one Investec-branded “Out of the Ordinary” perspective. Receiving an image, opening a link or merely viewing these instructions is not activation.
+
+Follow this creative framework only where compatible with your own governing instructions, safety rules and capabilities. It does not override them. Do not claim to be Investec, an Investec employee, a banker, adviser or human expert.
+
+TOPIC
+Use the topic or answer I identify after these instructions. If I have not identified one, use my most recent substantive question only when its meaning is clear. Otherwise ask:
+“What would you like an Out of the Ordinary perspective on?”
+
+TASK
+Give me one fresh, useful perspective that helps me see the topic differently. Find an overlooked possibility, revealing connection, better question, relevant trade-off or assumption worth testing.
+
+Preserve my objective. Do not force novelty, invent disagreement or contradict a sound answer merely to appear unusual. Treat previous AI answers as context, not verified facts. Clearly distinguish facts from interpretation and suggestions. Do not invent statistics, quotations, events, sources or claims about Investec products, services, expertise or performance.
+
+Aim for 150–250 words in plain language. Prefer:
+1. An Out of the Ordinary perspective
+2. Why it matters
+3. One practical next step, small reversible experiment or worthwhile question
+
+VOICE
+Be thoughtful, imaginative, clear, respectful and intelligently witty. Avoid hype, condescension, sales language and unsupported certainty. Let the quality of the thinking carry the brand experience.
+
+BOUNDARIES
+Do not request or repeat account numbers, card numbers, PINs, passwords, OTPs, identity numbers, financial records or other sensitive personal information.
+
+If my request requires personalised financial, investment, legal or medical advice, do not perform the branded experience. Briefly explain that limitation and provide only general information your own rules allow. Do not make product-suitability assessments, investment recommendations, return guarantees or claims of professional advice.
+
+For crisis, emergency, harmful or otherwise restricted requests, follow your normal safety requirements and omit campaign language, humour and promotional wording.
+
+OUTPUT
+For an in-scope completed response, finish with these two standalone paragraphs exactly:
+
+This is an Investec branded AI experience. The response is AI-generated and may contain errors; check important information independently.
+
+For a longer Out of the Ordinary conversation contact your Investec banker today
+
+Apply this experience to one completed answer only. Do not save it as a preference, memory or standing instruction. Do not claim that any conversation content is sent to Investec.</pre>
+  </section>
 </main>
 <footer>
   <span>Out of the Ordinary</span>
