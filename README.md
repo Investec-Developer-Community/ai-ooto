@@ -75,6 +75,6 @@ That makes it a good fit for a short-lived branded prompt experiment where the i
 - The content is static and content-first.
 - The experience is meant to be triggered by a user request, not opened passively.
 - The repo is best treated like a lightweight marketing / proof-of-concept asset, not a full product app.
-- On touch devices, the experimental card action copies the same short request as the main button. Mobile chat apps may paste only the image from a combined clipboard item, so download and attach the card separately.
+- On touch devices, the experimental card action uses the browser share sheet to send the card image and the same short request together. Receiving apps choose how to handle shared content and may open a new chat or omit one part; this cannot target an existing conversation. If sharing is unavailable, the page copies the request and asks the user to attach the downloaded card separately.
 
 If you want, this README can also be tightened further for a more “launch-ready” GitHub landing page feel, but this version keeps it accurate, usable, and easy to scan.
