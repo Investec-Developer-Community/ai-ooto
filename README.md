@@ -25,7 +25,8 @@ The site is designed to be easy to inspect, easy to host, and easy to reuse with
 ├── creative-brief.html     # public version of the brief
 ├── favicon.svg
 ├── investec-logo.svg
-├── investec-card.png
+├── investec-card.png        # alternate card artwork
+├── x_investec-card.png      # card artwork used by the landing page and share actions
 ├── .nojekyll               # keeps GitHub Pages static hosting clean
 ├── assets/                 # bundled CSS/JS assets
 └── ...
