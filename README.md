@@ -76,7 +76,7 @@ That makes it a good fit for a short-lived branded prompt experiment where the i
 - The content is static and content-first.
 - The experience is meant to be triggered by a user request, not opened passively.
 - The repo is best treated like a lightweight marketing / proof-of-concept asset, not a full product app.
-- The primary card action copies the PNG and instruction (including the public creative brief link) to the clipboard as separate formats. The app receiving the paste chooses which format to use, so it may paste the image or the text. If clipboard access is unavailable, “Share card” offers both to a supported app via the device share sheet. Sharing does not continue an existing AI conversation.
+- On touch-first devices that support sharing files, the primary card action opens the device share sheet with the PNG and instruction (including the public creative brief link). Otherwise it copies both to the clipboard as separate formats, and the receiving app chooses which format to use. Sharing does not continue an existing AI conversation.
 - “Copy instruction” is a separate option that copies the prompt and a link to the public creative brief. The page does not access or send the current chat; the user chooses whether to paste and send the instruction.
 
 If you want, this README can also be tightened further for a more “launch-ready” GitHub landing page feel, but this version keeps it accurate, usable, and easy to scan.

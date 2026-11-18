@@ -63,6 +63,23 @@
     }
   }
 
+  function canShareCard() {
+    return Boolean(
+      cardFile &&
+      typeof navigator.share === "function" &&
+      typeof navigator.canShare === "function" &&
+      navigator.canShare({ files: [cardFile], text: INSTRUCTION }),
+    );
+  }
+
+  function usePrimaryShareAction() {
+    return (
+      typeof window.matchMedia === "function" &&
+      window.matchMedia("(pointer: coarse)").matches &&
+      canShareCard()
+    );
+  }
+
   function updateInterface() {
     const status = document.querySelector(".ref-feedback");
     if (status) {
@@ -77,16 +94,23 @@
 
     const button = document.querySelector(".cta");
     if (button) {
+      const primaryShares = usePrimaryShareAction();
+      let label;
+      if (primaryShares) {
+        label = sharing ? "Opening share sheet…" : "Share card + instruction";
+      } else if (copyState === "working") {
+        label = "Preparing card…";
+      } else if (copyState === "success") {
+        label = "Copied";
+      } else {
+        label = "Copy card + instruction";
+      }
       setButtonLabel(
         button,
-        copyState === "working"
-          ? "Preparing card…"
-          : copyState === "success"
-            ? "Copied"
-            : "Copy card + instruction",
+        label,
       );
-      button.disabled = copyState === "working";
-      if (copyState === "working") {
+      button.disabled = primaryShares ? sharing : copyState === "working";
+      if (primaryShares ? sharing : copyState === "working") {
         if (button.getAttribute("aria-busy") !== "true") {
           button.setAttribute("aria-busy", "true");
         }
@@ -101,8 +125,8 @@
     const consent = document.querySelector("#ref-consent");
     if (consent) {
       const description =
-        "Copy card + instruction copies the image and prompt together. The app " +
-        "you paste into chooses which format to use. This page does not access or send your chat.";
+        "On supported touch devices, Share card + instruction opens the share " +
+        "sheet with both. Otherwise, the button copies both formats. This page does not access or send your chat.";
       if (consent.textContent !== description) consent.textContent = description;
     }
 
@@ -113,7 +137,7 @@
     const cardNote = document.querySelector(".secondary > .fine");
     if (cardNote) {
       const note =
-        "Copy card + instruction puts both on your clipboard; the app you paste into chooses which format to use. Share card sends both when supported, and Copy instruction remains available in More options.";
+        "On supported touch devices, the main button shares the card and instruction. Elsewhere it copies both formats; the app you paste into chooses which to use. Copy instruction remains available in More options.";
       if (cardNote.textContent !== note) cardNote.textContent = note;
     }
 
@@ -160,17 +184,10 @@
       optionsContent.append(shareButton);
     }
     if (shareButton) {
-      let canShareCard = false;
-      if (
-        cardFile &&
-        typeof navigator.canShare === "function"
-      ) {
-        canShareCard = navigator.canShare({
-          files: [cardFile],
-          text: INSTRUCTION,
-        });
-      }
-      const isHidden = !canShareCard || (!copyFailed && !options?.open);
+      const isHidden =
+        !canShareCard() ||
+        usePrimaryShareAction() ||
+        (!copyFailed && !options?.open);
       if (shareButton.hidden !== isHidden) shareButton.hidden = isHidden;
       shareButton.disabled = sharing;
       if (sharing && shareButton.getAttribute("aria-busy") !== "true") {
@@ -327,7 +344,11 @@
       if (button) {
         event.preventDefault();
         event.stopImmediatePropagation();
-        void copyCard(button);
+        if (usePrimaryShareAction()) {
+          void shareCard();
+        } else {
+          void copyCard(button);
+        }
         return;
       }
 
