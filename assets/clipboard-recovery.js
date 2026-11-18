@@ -4,14 +4,21 @@
   const INSTRUCTION =
     `Revisit your previous answer from an Out of the Ordinary perspective. ` +
     `Read and follow the brief at ${BRIEF_URL}`;
-  const cardFilePromise = fetch(CARD_URL, { credentials: "same-origin" }).then(
-    async (response) => {
+  let cardFile;
+  const cardFilePromise = fetch(CARD_URL, { credentials: "same-origin" })
+    .then(async (response) => {
       if (!response.ok) throw new Error("The card image could not be loaded.");
-      return new File([await response.blob()], "investec-out-of-the-ordinary-card.png", {
-        type: "image/png",
-      });
-    },
-  );
+      return new File(
+        [await response.blob()],
+        "investec-out-of-the-ordinary-card.png",
+        { type: "image/png" },
+      );
+    })
+    .then((file) => {
+      cardFile = file;
+      updateInterface();
+      return file;
+    });
   cardFilePromise.catch(() => {});
 
   let copyState = "idle";
@@ -94,8 +101,8 @@
     const consent = document.querySelector("#ref-consent");
     if (consent) {
       const description =
-        "Copies only the card image. The brief link is separate; " +
-        "this page does not access or send your chat.";
+        "Copy OOTO card copies only the image. Share card sends the image and " +
+        "instruction together when supported. This page does not access or send your chat.";
       if (consent.textContent !== description) consent.textContent = description;
     }
 
@@ -106,7 +113,7 @@
     const cardNote = document.querySelector(".secondary > .fine");
     if (cardNote) {
       const note =
-        "The card image does not contain the brief link. Copy the instruction separately from More options.";
+        "Copy OOTO card copies only the image. Share card sends the image and instruction together when supported; Copy instruction is available separately in More options.";
       if (cardNote.textContent !== note) cardNote.textContent = note;
     }
 
@@ -150,11 +157,20 @@
       shareButton.type = "button";
       shareButton.className = "ooto-share-button";
       shareButton.textContent = "Share card";
-      shareButton.hidden = true;
       optionsContent.append(shareButton);
     }
     if (shareButton) {
-      const isHidden = !copyFailed && !options?.open;
+      let canShareCard = false;
+      if (
+        cardFile &&
+        typeof navigator.canShare === "function"
+      ) {
+        canShareCard = navigator.canShare({
+          files: [cardFile],
+          text: INSTRUCTION,
+        });
+      }
+      const isHidden = !canShareCard || (!copyFailed && !options?.open);
       if (shareButton.hidden !== isHidden) shareButton.hidden = isHidden;
       shareButton.disabled = sharing;
       if (sharing && shareButton.getAttribute("aria-busy") !== "true") {
@@ -210,7 +226,9 @@
       ]);
       copyState = "success";
       copyFailed = false;
-      announce("Return to your current AI chat, paste and send.");
+      announce(
+        "Card copied. Paste it into your AI chat; if image paste is unavailable, use More options → Share card.",
+      );
     } catch {
       copyState = "idle";
       copyFailed = true;
@@ -251,22 +269,29 @@
 
   async function shareCard() {
     if (sharing) return;
+    if (!cardFile) {
+      announce("The card is still loading. Please try sharing again in a moment.");
+      return;
+    }
     sharing = true;
     updateInterface();
     try {
-      if (typeof navigator.share !== "function") {
+      if (
+        typeof navigator.share !== "function" ||
+        typeof navigator.canShare !== "function" ||
+        !navigator.canShare({ files: [cardFile], text: INSTRUCTION })
+      ) {
         throw new Error("Sharing is not supported here.");
       }
-      const file = await cardFilePromise;
-      const data = { title: "Investec — Out of the Ordinary", files: [file] };
-      if (
-        typeof navigator.canShare === "function" &&
-        !navigator.canShare({ files: data.files })
-      ) {
-        throw new Error("Sharing card images is not supported here.");
-      }
+      const data = {
+        title: "Investec — Out of the Ordinary",
+        text: INSTRUCTION,
+        files: [cardFile],
+      };
       await navigator.share(data);
-      announce("Card shared with your selected app. Sharing does not continue your AI conversation.");
+      announce(
+        "Card and instruction shared with your selected app. Sharing does not continue your AI conversation.",
+      );
     } catch (error) {
       announce(
         error?.name === "AbortError"
