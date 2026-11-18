@@ -1,6 +1,7 @@
 .investec-refined .cta,
 .investec-refined .secondary__row .tap,
-.investec-refined .ooto-share-button {
+.investec-refined .ooto-share-button,
+.investec-refined .ooto-prompt-button {
   min-height: 44px;
 }
 
@@ -19,7 +20,8 @@
   cursor: pointer;
 }
 
-.investec-refined .ooto-share-button {
+.investec-refined .ooto-share-button,
+.investec-refined .ooto-prompt-button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -34,11 +36,13 @@
   cursor: pointer;
 }
 
-.investec-refined .ooto-share-button:disabled {
+.investec-refined .ooto-share-button:disabled,
+.investec-refined .ooto-prompt-button:disabled {
   cursor: wait;
 }
 
-.investec-refined .ooto-share-button[hidden] {
+.investec-refined .ooto-share-button[hidden],
+.investec-refined .ooto-prompt-button[hidden] {
   display: none;
 }
 

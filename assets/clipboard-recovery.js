@@ -1,5 +1,9 @@
 (() => {
   const CARD_URL = new URL("./investec-card.png", window.location.href).href;
+  const BRIEF_URL = new URL("./creative-brief.html", window.location.href).href;
+  const INSTRUCTION =
+    `Revisit your previous answer from an Out of the Ordinary perspective. ` +
+    `Read and follow the brief at ${BRIEF_URL}`;
   const cardFilePromise = fetch(CARD_URL, { credentials: "same-origin" }).then(
     async (response) => {
       if (!response.ok) throw new Error("The card image could not be loaded.");
@@ -13,8 +17,10 @@
   let copyState = "idle";
   let copyFailed = false;
   let copying = false;
+  let copyingInstruction = false;
   let sharing = false;
   let shareButton;
+  let instructionButton;
 
   function announce(message) {
     const status = document.querySelector(".ref-feedback");
@@ -88,7 +94,8 @@
     const consent = document.querySelector("#ref-consent");
     if (consent) {
       const description =
-        "Copies the card image to your clipboard. It does not access or send your chat.";
+        "Copies only the card image. The brief link is separate; " +
+        "this page does not access or send your chat.";
       if (consent.textContent !== description) consent.textContent = description;
     }
 
@@ -98,7 +105,8 @@
 
     const cardNote = document.querySelector(".secondary > .fine");
     if (cardNote) {
-      const note = "The card image does not contain the brief link.";
+      const note =
+        "The card image does not contain the brief link. Copy the instruction separately from More options.";
       if (cardNote.textContent !== note) cardNote.textContent = note;
     }
 
@@ -108,6 +116,31 @@
     if (copyFailed && options && !options.open) options.open = true;
 
     const optionsContent = document.querySelector(".ref-options-content");
+    if (
+      optionsContent &&
+      (!instructionButton || !instructionButton.isConnected)
+    ) {
+      instructionButton = document.createElement("button");
+      instructionButton.type = "button";
+      instructionButton.className = "ooto-prompt-button";
+      instructionButton.textContent = "Copy instruction";
+      optionsContent.append(instructionButton);
+    }
+    if (instructionButton) {
+      instructionButton.disabled = copyingInstruction;
+      if (
+        copyingInstruction &&
+        instructionButton.getAttribute("aria-busy") !== "true"
+      ) {
+        instructionButton.setAttribute("aria-busy", "true");
+      } else if (!copyingInstruction) {
+        instructionButton.removeAttribute("aria-busy");
+      }
+      if (instructionButton.getAttribute("aria-describedby") !== "ref-feedback") {
+        instructionButton.setAttribute("aria-describedby", "ref-feedback");
+      }
+    }
+
     if (
       optionsContent &&
       typeof navigator.share === "function" &&
@@ -172,9 +205,8 @@
       ) {
         throw new Error("Image clipboard access is unavailable.");
       }
-      const image = await cardFilePromise;
       await navigator.clipboard.write([
-        new ClipboardItem({ "image/png": image }),
+        new window.ClipboardItem({ "image/png": cardFilePromise }),
       ]);
       copyState = "success";
       copyFailed = false;
@@ -187,6 +219,33 @@
       copying = false;
       updateInterface();
       button?.focus();
+    }
+  }
+
+  async function copyInstruction() {
+    if (copyingInstruction) return;
+    copyingInstruction = true;
+    updateInterface();
+    announce("");
+    try {
+      if (
+        !window.isSecureContext ||
+        typeof navigator.clipboard?.writeText !== "function"
+      ) {
+        throw new Error("Text clipboard access is unavailable.");
+      }
+      await navigator.clipboard.writeText(INSTRUCTION);
+      announce(
+        "Instruction copied. Paste it into your current AI chat and send it when ready.",
+      );
+    } catch {
+      announce(
+        "The instruction could not be copied here. Try again in a browser that allows clipboard access.",
+      );
+    } finally {
+      copyingInstruction = false;
+      updateInterface();
+      instructionButton?.focus();
     }
   }
 
@@ -247,6 +306,12 @@
       if (event.target.closest(".ooto-share-button")) {
         event.preventDefault();
         void shareCard();
+        return;
+      }
+
+      if (event.target.closest(".ooto-prompt-button")) {
+        event.preventDefault();
+        void copyInstruction();
       }
     },
     true,

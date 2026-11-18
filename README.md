@@ -75,6 +75,7 @@ That makes it a good fit for a short-lived branded prompt experiment where the i
 - The content is static and content-first.
 - The experience is meant to be triggered by a user request, not opened passively.
 - The repo is best treated like a lightweight marketing / proof-of-concept asset, not a full product app.
-- The primary card action copies the PNG to the clipboard. If that is unavailable, the page offers a download and, where supported, a Share card option. Sharing sends only the card image and does not continue an existing AI conversation.
+- The primary card action copies only the PNG to the clipboard. If image copying is unavailable, the page offers a download and, where supported, a Share card option; sharing sends only the card image and does not continue an existing AI conversation.
+- “Copy instruction” is a separate option that copies the prompt and a link to the public creative brief. It does not access or send the current chat; the user chooses whether to paste and send it.
 
 If you want, this README can also be tightened further for a more “launch-ready” GitHub landing page feel, but this version keeps it accurate, usable, and easy to scan.
