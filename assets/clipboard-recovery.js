@@ -1,168 +1,288 @@
 (() => {
-  const isTouchDevice =
-    typeof window.matchMedia === "function" &&
-    window.matchMedia("(pointer: coarse)").matches;
-
-  if (!isTouchDevice) return;
-
-  const SHORT_REQUEST =
-    "Give this conversation an Out of the Ordinary perspective. Before responding, open and read the complete instructions at https://investec-developer-community.github.io/ai-ooto/creative-brief.html. Apply them to one answer in this conversation. If you cannot access or read the brief, say so and ask me to paste it; do not claim to have applied it.";
-  const cardFilePromise = fetch(new URL("./investec-card.png", window.location.href), {
-    credentials: "same-origin",
-  }).then(async (response) => {
-    if (!response.ok) throw new Error("The campaign card could not be loaded.");
-    return new File(
-      [await response.blob()],
-      "investec-out-of-the-ordinary-card.png",
-      { type: "image/png" },
-    );
-  });
+  const CARD_URL = new URL("./investec-card.png", window.location.href).href;
+  const cardFilePromise = fetch(CARD_URL, { credentials: "same-origin" }).then(
+    async (response) => {
+      if (!response.ok) throw new Error("The card image could not be loaded.");
+      return new File([await response.blob()], "investec-out-of-the-ordinary-card.png", {
+        type: "image/png",
+      });
+    },
+  );
   cardFilePromise.catch(() => {});
+
+  let copyState = "idle";
+  let copyFailed = false;
   let copying = false;
+  let sharing = false;
+  let shareButton;
 
   function announce(message) {
     const status = document.querySelector(".ref-feedback");
     if (status) status.textContent = message;
   }
 
-  function findCardCopyButton(target) {
-    const button = target instanceof Element ? target.closest("button") : null;
-    return button &&
-      (button.getAttribute("aria-label") === "Share card and request" ||
-        button.textContent?.trim().startsWith("Copy card +"))
-      ? button
-      : null;
-  }
-
-  function hasRichClipboardSupport() {
-    return (
-      Boolean(window.isSecureContext) &&
-      typeof navigator.clipboard?.write === "function" &&
-      typeof window.ClipboardItem === "function"
-    );
-  }
-
-  async function shareCardAndRequest() {
-    if (typeof navigator.share !== "function") {
-      throw new Error("Sharing is not supported in this browser.");
+  function setButtonLabel(button, label) {
+    const walker = document.createTreeWalker(button, NodeFilter.SHOW_TEXT);
+    let node;
+    let lastTextNode;
+    while ((node = walker.nextNode())) {
+      if (node.textContent.trim()) lastTextNode = node;
     }
-
-    const image = await cardFilePromise;
-    const shareData = {
-      title: "Investec — Out of the Ordinary",
-      text: SHORT_REQUEST,
-      files: [image],
-    };
-
-    if (
-      typeof navigator.canShare === "function" &&
-      !navigator.canShare({ files: shareData.files })
-    ) {
-      throw new Error("Sharing images is not supported in this browser.");
+    if (lastTextNode && lastTextNode.textContent !== label) {
+      lastTextNode.textContent = label;
     }
-
-    await navigator.share(shareData);
+    if (button.getAttribute("aria-label") !== label) {
+      button.setAttribute("aria-label", label);
+    }
   }
 
-  async function copyText(text) {
-    if (typeof navigator.clipboard?.writeText === "function") {
-      try {
-        await navigator.clipboard.writeText(text);
-        return;
-      } catch {
-        // Try the manual-compatible browser copy path below.
+  function setTextContent(element, text) {
+    const walker = document.createTreeWalker(element, NodeFilter.SHOW_TEXT);
+    let node;
+    let lastTextNode;
+    while ((node = walker.nextNode())) {
+      if (node.textContent.trim()) lastTextNode = node;
+    }
+    if (lastTextNode) {
+      if (lastTextNode.textContent !== text) lastTextNode.textContent = text;
+    } else {
+      element.append(document.createTextNode(text));
+    }
+  }
+
+  function updateInterface() {
+    const status = document.querySelector(".ref-feedback");
+    if (status) {
+      if (status.id !== "ref-feedback") status.id = "ref-feedback";
+      if (status.getAttribute("role") !== "status") {
+        status.setAttribute("role", "status");
+      }
+      if (status.getAttribute("aria-live") !== "polite") {
+        status.setAttribute("aria-live", "polite");
       }
     }
 
-    const previousFocus = document.activeElement;
-    const textarea = document.createElement("textarea");
-    textarea.value = text;
-    textarea.setAttribute("readonly", "");
-    Object.assign(textarea.style, {
-      position: "fixed",
-      left: "-9999px",
-      opacity: "0",
-    });
+    const button = document.querySelector(".cta");
+    if (button) {
+      setButtonLabel(
+        button,
+        copyState === "working"
+          ? "Preparing card…"
+          : copyState === "success"
+            ? "Copied"
+            : "Copy OOTO card",
+      );
+      button.disabled = copyState === "working";
+      if (copyState === "working") {
+        if (button.getAttribute("aria-busy") !== "true") {
+          button.setAttribute("aria-busy", "true");
+        }
+      } else {
+        button.removeAttribute("aria-busy");
+      }
+      if (button.getAttribute("aria-describedby") !== "ref-consent ref-feedback") {
+        button.setAttribute("aria-describedby", "ref-consent ref-feedback");
+      }
+    }
+
+    const consent = document.querySelector("#ref-consent");
+    if (consent) {
+      const description =
+        "Copies the card image to your clipboard. It does not access or send your chat.";
+      if (consent.textContent !== description) consent.textContent = description;
+    }
+
+    const originalCardCopy = [...document.querySelectorAll(".secondary__row button")]
+      .find((item) => item.textContent.trim().startsWith("Copy card +"));
+    originalCardCopy?.remove();
+
+    const cardNote = document.querySelector(".secondary > .fine");
+    if (cardNote) {
+      const note = "The card image does not contain the brief link.";
+      if (cardNote.textContent !== note) cardNote.textContent = note;
+    }
+
+    const options = document.querySelector(".ref-options");
+    const summary = options?.querySelector("summary");
+    if (summary) setTextContent(summary, "More options");
+    if (copyFailed && options && !options.open) options.open = true;
+
+    const optionsContent = document.querySelector(".ref-options-content");
+    if (
+      optionsContent &&
+      typeof navigator.share === "function" &&
+      (!shareButton || !shareButton.isConnected)
+    ) {
+      shareButton = document.createElement("button");
+      shareButton.type = "button";
+      shareButton.className = "ooto-share-button";
+      shareButton.textContent = "Share card";
+      shareButton.hidden = true;
+      optionsContent.append(shareButton);
+    }
+    if (shareButton) {
+      const isHidden = !copyFailed && !options?.open;
+      if (shareButton.hidden !== isHidden) shareButton.hidden = isHidden;
+      shareButton.disabled = sharing;
+      if (sharing && shareButton.getAttribute("aria-busy") !== "true") {
+        shareButton.setAttribute("aria-busy", "true");
+      }
+      else shareButton.removeAttribute("aria-busy");
+    }
+
+    const image = document.querySelector(".ref-artwork");
+    if (image) {
+      const imageAlt =
+        "Investec Out of the Ordinary card artwork: a matte-black bank card shown as a cut-out.";
+      if (image.alt !== imageAlt) image.alt = imageAlt;
+      if (!image.draggable) image.draggable = true;
+      if (image.tabIndex !== 0) image.tabIndex = 0;
+      if (image.getAttribute("role") !== "button") {
+        image.setAttribute("role", "button");
+      }
+      const imageLabel = "Download the Out of the Ordinary card as a PNG";
+      if (image.getAttribute("aria-label") !== imageLabel) {
+        image.setAttribute("aria-label", imageLabel);
+      }
+    }
+
+    if (!document.querySelector(".ooto-drag-hint")) {
+      const primary = document.querySelector(".primary-action");
+      if (primary) {
+        const hint = document.createElement("p");
+        hint.className = "ooto-drag-hint";
+        hint.textContent = "Or drag the card into your open AI chat.";
+        primary.after(hint);
+      }
+    }
+  }
+
+  async function copyCard(button) {
+    if (copying) return;
+    copying = true;
+    copyState = "working";
+    updateInterface();
+    announce("");
 
     try {
-      document.body.appendChild(textarea);
-      textarea.select();
-      textarea.setSelectionRange(0, text.length);
-      if (!document.execCommand("copy")) {
-        throw new Error("The browser did not allow text to be copied.");
+      if (
+        !window.isSecureContext ||
+        typeof navigator.clipboard?.write !== "function" ||
+        typeof window.ClipboardItem !== "function"
+      ) {
+        throw new Error("Image clipboard access is unavailable.");
       }
+      const image = await cardFilePromise;
+      await navigator.clipboard.write([
+        new ClipboardItem({ "image/png": image }),
+      ]);
+      copyState = "success";
+      copyFailed = false;
+      announce("Return to your current AI chat, paste and send.");
+    } catch {
+      copyState = "idle";
+      copyFailed = true;
+      announce("Copy did not work here. Download or share the card instead.");
     } finally {
-      textarea.remove();
-      if (previousFocus instanceof HTMLElement) previousFocus.focus();
+      copying = false;
+      updateInterface();
+      button?.focus();
     }
+  }
+
+  async function shareCard() {
+    if (sharing) return;
+    sharing = true;
+    updateInterface();
+    try {
+      if (typeof navigator.share !== "function") {
+        throw new Error("Sharing is not supported here.");
+      }
+      const file = await cardFilePromise;
+      const data = { title: "Investec — Out of the Ordinary", files: [file] };
+      if (
+        typeof navigator.canShare === "function" &&
+        !navigator.canShare({ files: data.files })
+      ) {
+        throw new Error("Sharing card images is not supported here.");
+      }
+      await navigator.share(data);
+      announce("Card shared with your selected app. Sharing does not continue your AI conversation.");
+    } catch (error) {
+      announce(
+        error?.name === "AbortError"
+          ? "Sharing was cancelled. The card was not shared."
+          : "The card could not be shared here. Download the PNG instead.",
+      );
+    } finally {
+      sharing = false;
+      updateInterface();
+    }
+  }
+
+  function downloadCard() {
+    const downloadLink = document.querySelector('.secondary__row a[download]');
+    if (downloadLink) downloadLink.click();
   }
 
   document.addEventListener(
     "click",
     (event) => {
-      const button = findCardCopyButton(event.target);
-      if (!button || button.disabled || copying) return;
+      if (!(event.target instanceof Element)) return;
+      const image = event.target.closest(".ref-artwork");
+      if (image) {
+        event.preventDefault();
+        downloadCard();
+        return;
+      }
 
-      event.preventDefault();
-      event.stopImmediatePropagation();
-      copying = true;
-      button.disabled = true;
-      button.setAttribute("aria-busy", "true");
+      const button = event.target.closest(".cta");
+      if (button) {
+        event.preventDefault();
+        event.stopImmediatePropagation();
+        void copyCard(button);
+        return;
+      }
 
-      void (async () => {
-        try {
-          await shareCardAndRequest();
-          announce(
-            "Shared with your selected app. Check whether it received both the card and request; ChatGPT may open a new chat instead of your current conversation.",
-          );
-        } catch (error) {
-          if (error?.name === "AbortError") {
-            announce("Sharing was cancelled. Nothing was copied or sent.");
-            return;
-          }
-
-          try {
-            await copyText(SHORT_REQUEST);
-            announce(
-              "Sharing the card and request was unavailable, so only the request text was copied. Download the card and attach it separately.",
-            );
-          } catch {
-            announce(
-              "Sharing and copying the request failed. Use Copy the perspective and attach the downloaded card separately.",
-            );
-          }
-        } finally {
-          copying = false;
-          button.disabled = false;
-          button.removeAttribute("aria-busy");
-        }
-      })();
+      if (event.target.closest(".ooto-share-button")) {
+        event.preventDefault();
+        void shareCard();
+      }
     },
     true,
   );
 
-  const enableTextFallback = () => {
-    document.querySelectorAll("button").forEach((button) => {
+  document.addEventListener(
+    "keydown",
+    (event) => {
       if (
-        button.textContent?.trim().startsWith("Copy card +") &&
-        !button.hasAttribute("aria-busy")
+        (event.key === "Enter" || event.key === " ") &&
+        event.target instanceof Element &&
+        event.target.matches(".ref-artwork")
       ) {
-        const walker = document.createTreeWalker(button, NodeFilter.SHOW_TEXT);
-        let textNode;
-        while ((textNode = walker.nextNode())) {
-          if (textNode.textContent?.trim().startsWith("Copy card +")) {
-            textNode.textContent = "Share card + request";
-          }
-        }
-        button.setAttribute("aria-label", "Share card and request");
-        if (!hasRichClipboardSupport()) button.disabled = false;
+        event.preventDefault();
+        downloadCard();
       }
-    });
-  };
+    },
+    true,
+  );
 
-  enableTextFallback();
-  new MutationObserver(enableTextFallback).observe(document.documentElement, {
+  document.addEventListener("dragstart", (event) => {
+    if (
+      event.target instanceof HTMLImageElement &&
+      event.target.matches(".ref-artwork") &&
+      event.dataTransfer
+    ) {
+      event.dataTransfer.setData("text/uri-list", CARD_URL);
+      event.dataTransfer.setData("text/plain", CARD_URL);
+    }
+  });
+
+  updateInterface();
+  new MutationObserver(updateInterface).observe(document.documentElement, {
     childList: true,
     subtree: true,
+    attributes: true,
+    attributeFilter: ["open"],
   });
 })();

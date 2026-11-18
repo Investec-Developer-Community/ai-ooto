@@ -1,0 +1,66 @@
+.investec-refined .cta,
+.investec-refined .secondary__row .tap,
+.investec-refined .ooto-share-button {
+  min-height: 44px;
+}
+
+.investec-refined :where(button, a, summary, [role="button"], [role="link"]):focus-visible {
+  outline: 3px solid #8a641f;
+  outline-offset: 3px;
+}
+
+.investec-refined .ref-feedback {
+  min-height: 1.6em;
+  color: #242424;
+  font-size: 16px;
+}
+
+.investec-refined .ref-artwork[role="button"] {
+  cursor: pointer;
+}
+
+.investec-refined .ooto-share-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 12px;
+  padding: 10px 16px;
+  border: 1px solid #242424;
+  border-radius: 2px;
+  background: #fff;
+  color: #171717;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.investec-refined .ooto-share-button:disabled {
+  cursor: wait;
+}
+
+.investec-refined .ooto-share-button[hidden] {
+  display: none;
+}
+
+.investec-refined .ooto-drag-hint {
+  display: none;
+}
+
+@media (min-width: 768px) {
+  .investec-refined .ooto-drag-hint {
+    display: block;
+    margin: 8px 0 0;
+    color: #242424;
+    font-size: 15px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .investec-refined *,
+  .investec-refined *::before,
+  .investec-refined *::after {
+    scroll-behavior: auto !important;
+    animation: none !important;
+    transition: none !important;
+  }
+}
