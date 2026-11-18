@@ -59,10 +59,10 @@ In GitHub:
 4. Set folder to `/ (root)`
 5. Save
 
-The pages will then be available at a URL like:
+The public pages are available at:
 
-- `https://YOUR-USERNAME.github.io/ai-ooto/`
-- `https://YOUR-USERNAME.github.io/ai-ooto/creative-brief.html`
+- https://investec-developer-community.github.io/ai-ooto/
+- https://investec-developer-community.github.io/ai-ooto/creative-brief.html
 
 ## Why it’s built this way
 
