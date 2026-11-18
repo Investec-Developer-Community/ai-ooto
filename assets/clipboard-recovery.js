@@ -83,7 +83,7 @@
           ? "Preparing card…"
           : copyState === "success"
             ? "Copied"
-            : "Copy OOTO card",
+            : "Copy card + instruction",
       );
       button.disabled = copyState === "working";
       if (copyState === "working") {
@@ -101,8 +101,8 @@
     const consent = document.querySelector("#ref-consent");
     if (consent) {
       const description =
-        "Copy OOTO card copies only the image. Share card sends the image and " +
-        "instruction together when supported. This page does not access or send your chat.";
+        "Copy card + instruction copies the image and prompt together. The app " +
+        "you paste into chooses which format to use. This page does not access or send your chat.";
       if (consent.textContent !== description) consent.textContent = description;
     }
 
@@ -113,7 +113,7 @@
     const cardNote = document.querySelector(".secondary > .fine");
     if (cardNote) {
       const note =
-        "Copy OOTO card copies only the image. Share card sends the image and instruction together when supported; Copy instruction is available separately in More options.";
+        "Copy card + instruction puts both on your clipboard; the app you paste into chooses which format to use. Share card sends both when supported, and Copy instruction remains available in More options.";
       if (cardNote.textContent !== note) cardNote.textContent = note;
     }
 
@@ -222,12 +222,15 @@
         throw new Error("Image clipboard access is unavailable.");
       }
       await navigator.clipboard.write([
-        new window.ClipboardItem({ "image/png": cardFilePromise }),
+        new window.ClipboardItem({
+          "image/png": cardFilePromise,
+          "text/plain": new Blob([INSTRUCTION], { type: "text/plain" }),
+        }),
       ]);
       copyState = "success";
       copyFailed = false;
       announce(
-        "Card copied. Paste it into your AI chat; if image paste is unavailable, use More options → Share card.",
+        "Card and instruction copied. Paste them into your AI chat; the app may use the image or instruction depending on how it handles clipboard formats.",
       );
     } catch {
       copyState = "idle";
