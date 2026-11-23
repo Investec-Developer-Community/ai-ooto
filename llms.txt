@@ -1,8 +1,9 @@
-# Investec Out of the Ordinary — AI framework
+# Investec Out of the Ordinary — AI experience
 
-> A lightweight campaign site for an Investec-branded AI perspective. The creative brief is user-activated, applies for one turn only, and does not override an AI platform’s governing instructions or safety rules.
+> A user-activated AI experience for a fresh perspective on the immediately preceding exchange. The brief applies for one turn only and does not override an AI platform’s policies or safety rules.
 
-## Creative brief
+## Pages
 
-- [Creative brief (Markdown)](./creative-brief.md): Complete text of the Out of the Ordinary AI framework.
-- [Creative brief (HTML)](./creative-brief.html): Human-readable presentation of the same framework.
+- [Home page (Markdown)](https://investec-developer-community.github.io/ai-ooto/index.md): AI-readable overview of the experience.
+- [Creative brief (Markdown)](https://investec-developer-community.github.io/ai-ooto/creative-brief.md): Complete text of the Out of the Ordinary AI framework.
+- [Creative brief (HTML)](https://investec-developer-community.github.io/ai-ooto/creative-brief.html): Human-readable presentation of the framework.

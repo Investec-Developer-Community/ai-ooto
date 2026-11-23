@@ -14,6 +14,11 @@ sections are development milestones, not formal releases.
 
 ## [Unreleased]
 
+### Changed
+
+- Made the landing page's primary action copy only the prompt and removed the
+  device share-sheet and image-copy actions.
+
 ## Development history
 
 ### 2026-11-23

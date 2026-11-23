@@ -1,7 +1,5 @@
 .investec-refined .cta,
-.investec-refined .secondary__row .tap,
-.investec-refined .ooto-share-button,
-.investec-refined .ooto-prompt-button {
+.investec-refined .secondary__row .tap {
   min-height: 44px;
 }
 
@@ -18,32 +16,6 @@
 
 .investec-refined .ref-artwork[role="button"] {
   cursor: pointer;
-}
-
-.investec-refined .ooto-share-button,
-.investec-refined .ooto-prompt-button {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  margin-top: 12px;
-  padding: 10px 16px;
-  border: 1px solid #242424;
-  border-radius: 2px;
-  background: #fff;
-  color: #171717;
-  font: inherit;
-  font-weight: 600;
-  cursor: pointer;
-}
-
-.investec-refined .ooto-share-button:disabled,
-.investec-refined .ooto-prompt-button:disabled {
-  cursor: wait;
-}
-
-.investec-refined .ooto-share-button[hidden],
-.investec-refined .ooto-prompt-button[hidden] {
-  display: none;
 }
 
 .investec-refined .ooto-drag-hint {

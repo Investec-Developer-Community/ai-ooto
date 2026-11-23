@@ -1,7 +1,7 @@
 # OOTO AI Thing
 
 A tiny static campaign site for the Investec “Out of the Ordinary” AI experience.
-This repo is basically a landing page, a public creative brief, and the assets needed to make the experience feel polished and shareable.
+This repo is basically a landing page, a public creative brief, and the assets needed to make the experience feel polished.
 
 It’s intentionally lightweight: no backend, no framework, no build pipeline. Just static HTML, CSS, and a few bundled image assets for GitHub Pages.
 
@@ -30,7 +30,7 @@ The site is designed to be easy to inspect, easy to host, and easy to reuse with
 ├── favicon.svg
 ├── investec-logo.svg
 ├── investec-card.png        # alternate card artwork
-├── x_investec-card.png      # card artwork used by the landing page and share actions
+├── x_investec-card.png      # card artwork used by the landing page and downloads
 ├── .nojekyll               # keeps GitHub Pages static hosting clean
 ├── assets/                 # bundled CSS/JS assets
 └── ...
@@ -67,6 +67,7 @@ In GitHub:
 The public pages are available at:
 
 - https://investec-developer-community.github.io/ai-ooto/
+- https://investec-developer-community.github.io/ai-ooto/index.md
 - https://investec-developer-community.github.io/ai-ooto/creative-brief.html
 - https://investec-developer-community.github.io/ai-ooto/creative-brief.md
 - https://investec-developer-community.github.io/ai-ooto/llms.txt
@@ -80,10 +81,10 @@ That makes it a good fit for a short-lived branded prompt experiment where the i
 ## Notes
 
 - The content is static and content-first.
-- The creative brief is available as both HTML and Markdown. GitHub Pages serves static files by URL and does not negotiate a Markdown response based on the `Accept` request header.
+- The homepage and creative brief are available as Markdown files as well as HTML. GitHub Pages serves static files by URL and does not negotiate a Markdown response based on the `Accept` request header.
 - The experience is meant to be triggered by a user request, not opened passively.
 - The repo is best treated like a lightweight marketing / proof-of-concept asset, not a full product app.
-- On touch-first devices that support sharing files, the primary card action opens the device share sheet with the PNG and instruction (including the public creative brief link). Otherwise it copies both to the clipboard as separate formats, and the receiving app chooses which format to use. Sharing does not continue an existing AI conversation.
-- “Copy instruction” is a separate option that copies the prompt and a link to the public creative brief. The page does not access or send the current chat; the user chooses whether to paste and send the instruction.
+- The primary action copies the prompt and a link to the public creative brief. Paste it into the AI conversation already open and send it when ready. The page does not access or send chat content.
+- The card remains available as artwork and can be downloaded separately; it is not attached to the copied prompt.
 
 If you want, this README can also be tightened further for a more “launch-ready” GitHub landing page feel, but this version keeps it accurate, usable, and easy to scan.

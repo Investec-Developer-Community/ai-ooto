@@ -5,30 +5,8 @@
   const INSTRUCTION =
     `Revisit your previous answer from an Out of the Ordinary perspective. ` +
     `Read and follow the brief at ${BRIEF_URL}`;
-  let cardFile;
-  const cardFilePromise = fetch(CARD_URL, { credentials: "same-origin" })
-    .then(async (response) => {
-      if (!response.ok) throw new Error("The card image could not be loaded.");
-      return new File(
-        [await response.blob()],
-        "investec-out-of-the-ordinary-card.png",
-        { type: "image/png" },
-      );
-    })
-    .then((file) => {
-      cardFile = file;
-      updateInterface();
-      return file;
-    });
-  cardFilePromise.catch(() => {});
-
-  let copyState = "idle";
-  let copyFailed = false;
-  let copying = false;
-  let copyingInstruction = false;
-  let sharing = false;
-  let shareButton;
-  let instructionButton;
+  let promptCopied = false;
+  let copyingPrompt = false;
 
   function announce(message) {
     const status = document.querySelector(".ref-feedback");
@@ -64,23 +42,6 @@
     }
   }
 
-  function canShareCard() {
-    return Boolean(
-      cardFile &&
-      typeof navigator.share === "function" &&
-      typeof navigator.canShare === "function" &&
-      navigator.canShare({ files: [cardFile], text: INSTRUCTION }),
-    );
-  }
-
-  function usePrimaryShareAction() {
-    return (
-      typeof window.matchMedia === "function" &&
-      window.matchMedia("(pointer: coarse)").matches &&
-      canShareCard()
-    );
-  }
-
   function updateInterface() {
     const status = document.querySelector(".ref-feedback");
     if (status) {
@@ -95,23 +56,14 @@
 
     const button = document.querySelector(".cta");
     if (button) {
-      const primaryShares = usePrimaryShareAction();
-      let label;
-      if (primaryShares) {
-        label = sharing ? "Opening share sheet…" : "Share card + instruction";
-      } else if (copyState === "working") {
-        label = "Preparing card…";
-      } else if (copyState === "success") {
-        label = "Copied";
-      } else {
-        label = "Copy card + instruction";
-      }
-      setButtonLabel(
-        button,
-        label,
-      );
-      button.disabled = primaryShares ? sharing : copyState === "working";
-      if (primaryShares ? sharing : copyState === "working") {
+      const label = copyingPrompt
+        ? "Copying prompt…"
+        : promptCopied
+          ? "Prompt copied"
+          : "Copy prompt";
+      setButtonLabel(button, label);
+      button.disabled = copyingPrompt;
+      if (copyingPrompt) {
         if (button.getAttribute("aria-busy") !== "true") {
           button.setAttribute("aria-busy", "true");
         }
@@ -126,8 +78,8 @@
     const consent = document.querySelector("#ref-consent");
     if (consent) {
       const description =
-        "On supported touch devices, Share card + instruction opens the share " +
-        "sheet with both. Otherwise, the button copies both formats. This page does not access or send your chat.";
+        "Copy the prompt, then paste it into your current AI chat and send it " +
+        "when ready. This page does not access or send your chat.";
       if (consent.textContent !== description) consent.textContent = description;
     }
 
@@ -138,64 +90,14 @@
     const cardNote = document.querySelector(".secondary > .fine");
     if (cardNote) {
       const note =
-        "On supported touch devices, the main button shares the card and instruction. Elsewhere it copies both formats; the app you paste into chooses which to use. Copy instruction remains available in More options.";
+        "The main button copies the prompt for your current AI chat. Download " +
+        "the card separately if you want to use the artwork.";
       if (cardNote.textContent !== note) cardNote.textContent = note;
     }
 
     const options = document.querySelector(".ref-options");
     const summary = options?.querySelector("summary");
     if (summary) setTextContent(summary, "More options");
-    if (copyFailed && options && !options.open) options.open = true;
-
-    const optionsContent = document.querySelector(".ref-options-content");
-    if (
-      optionsContent &&
-      (!instructionButton || !instructionButton.isConnected)
-    ) {
-      instructionButton = document.createElement("button");
-      instructionButton.type = "button";
-      instructionButton.className = "ooto-prompt-button";
-      instructionButton.textContent = "Copy instruction";
-      optionsContent.append(instructionButton);
-    }
-    if (instructionButton) {
-      instructionButton.disabled = copyingInstruction;
-      if (
-        copyingInstruction &&
-        instructionButton.getAttribute("aria-busy") !== "true"
-      ) {
-        instructionButton.setAttribute("aria-busy", "true");
-      } else if (!copyingInstruction) {
-        instructionButton.removeAttribute("aria-busy");
-      }
-      if (instructionButton.getAttribute("aria-describedby") !== "ref-feedback") {
-        instructionButton.setAttribute("aria-describedby", "ref-feedback");
-      }
-    }
-
-    if (
-      optionsContent &&
-      typeof navigator.share === "function" &&
-      (!shareButton || !shareButton.isConnected)
-    ) {
-      shareButton = document.createElement("button");
-      shareButton.type = "button";
-      shareButton.className = "ooto-share-button";
-      shareButton.textContent = "Share card";
-      optionsContent.append(shareButton);
-    }
-    if (shareButton) {
-      const isHidden =
-        !canShareCard() ||
-        usePrimaryShareAction() ||
-        (!copyFailed && !options?.open);
-      if (shareButton.hidden !== isHidden) shareButton.hidden = isHidden;
-      shareButton.disabled = sharing;
-      if (sharing && shareButton.getAttribute("aria-busy") !== "true") {
-        shareButton.setAttribute("aria-busy", "true");
-      }
-      else shareButton.removeAttribute("aria-busy");
-    }
 
     const image = document.querySelector(".ref-artwork");
     if (image) {
@@ -224,46 +126,10 @@
     }
   }
 
-  async function copyCard(button) {
-    if (copying) return;
-    copying = true;
-    copyState = "working";
-    updateInterface();
-    announce("");
-
-    try {
-      if (
-        !window.isSecureContext ||
-        typeof navigator.clipboard?.write !== "function" ||
-        typeof window.ClipboardItem !== "function"
-      ) {
-        throw new Error("Image clipboard access is unavailable.");
-      }
-      await navigator.clipboard.write([
-        new window.ClipboardItem({
-          "image/png": cardFilePromise,
-          "text/plain": new Blob([INSTRUCTION], { type: "text/plain" }),
-        }),
-      ]);
-      copyState = "success";
-      copyFailed = false;
-      announce(
-        "Card and instruction copied. Paste them into your AI chat; the app may use the image or instruction depending on how it handles clipboard formats.",
-      );
-    } catch {
-      copyState = "idle";
-      copyFailed = true;
-      announce("Copy did not work here. Download or share the card instead.");
-    } finally {
-      copying = false;
-      updateInterface();
-      button?.focus();
-    }
-  }
-
-  async function copyInstruction() {
-    if (copyingInstruction) return;
-    copyingInstruction = true;
+  async function copyInstruction(button) {
+    if (copyingPrompt) return;
+    copyingPrompt = true;
+    promptCopied = false;
     updateInterface();
     announce("");
     try {
@@ -274,54 +140,18 @@
         throw new Error("Text clipboard access is unavailable.");
       }
       await navigator.clipboard.writeText(INSTRUCTION);
+      promptCopied = true;
       announce(
-        "Instruction copied. Paste it into your current AI chat and send it when ready.",
+        "Prompt copied. Paste it into your current AI chat and send it when ready.",
       );
     } catch {
       announce(
-        "The instruction could not be copied here. Try again in a browser that allows clipboard access.",
+        "The prompt could not be copied here. Try again in a browser that allows clipboard access.",
       );
     } finally {
-      copyingInstruction = false;
+      copyingPrompt = false;
       updateInterface();
-      instructionButton?.focus();
-    }
-  }
-
-  async function shareCard() {
-    if (sharing) return;
-    if (!cardFile) {
-      announce("The card is still loading. Please try sharing again in a moment.");
-      return;
-    }
-    sharing = true;
-    updateInterface();
-    try {
-      if (
-        typeof navigator.share !== "function" ||
-        typeof navigator.canShare !== "function" ||
-        !navigator.canShare({ files: [cardFile], text: INSTRUCTION })
-      ) {
-        throw new Error("Sharing is not supported here.");
-      }
-      const data = {
-        title: "Investec — Out of the Ordinary",
-        text: INSTRUCTION,
-        files: [cardFile],
-      };
-      await navigator.share(data);
-      announce(
-        "Card and instruction shared with your selected app. Sharing does not continue your AI conversation.",
-      );
-    } catch (error) {
-      announce(
-        error?.name === "AbortError"
-          ? "Sharing was cancelled. The card was not shared."
-          : "The card could not be shared here. Download the PNG instead.",
-      );
-    } finally {
-      sharing = false;
-      updateInterface();
+      button?.focus();
     }
   }
 
@@ -345,23 +175,7 @@
       if (button) {
         event.preventDefault();
         event.stopImmediatePropagation();
-        if (usePrimaryShareAction()) {
-          void shareCard();
-        } else {
-          void copyCard(button);
-        }
-        return;
-      }
-
-      if (event.target.closest(".ooto-share-button")) {
-        event.preventDefault();
-        void shareCard();
-        return;
-      }
-
-      if (event.target.closest(".ooto-prompt-button")) {
-        event.preventDefault();
-        void copyInstruction();
+        void copyInstruction(button);
       }
     },
     true,
