@@ -21,6 +21,7 @@ The site is designed to be easy to inspect, easy to host, and easy to reuse with
 ```text
 .
 ├── README.md
+├── CHANGELOG.md           # notable project changes
 ├── index.html              # landing page
 ├── creative-brief.html     # public version of the brief
 ├── creative-brief.md       # Markdown version for AI and text clients
