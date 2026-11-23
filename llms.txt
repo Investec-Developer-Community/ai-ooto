@@ -1,0 +1,8 @@
+# Investec Out of the Ordinary — AI framework
+
+> A lightweight campaign site for an Investec-branded AI perspective. The creative brief is user-activated, applies for one turn only, and does not override an AI platform’s governing instructions or safety rules.
+
+## Creative brief
+
+- [Creative brief (Markdown)](./creative-brief.md): Complete text of the Out of the Ordinary AI framework.
+- [Creative brief (HTML)](./creative-brief.html): Human-readable presentation of the same framework.

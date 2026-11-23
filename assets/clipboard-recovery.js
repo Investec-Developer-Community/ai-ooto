@@ -1,6 +1,7 @@
 (() => {
   const CARD_URL = new URL("./x_investec-card.png", window.location.href).href;
-  const BRIEF_URL = "https://bit.ly/ooto-poc";
+  const BRIEF_URL =
+    "https://investec-developer-community.github.io/ai-ooto/creative-brief.html";
   const INSTRUCTION =
     `Revisit your previous answer from an Out of the Ordinary perspective. ` +
     `Read and follow the brief at ${BRIEF_URL}`;

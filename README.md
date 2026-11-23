@@ -23,6 +23,9 @@ The site is designed to be easy to inspect, easy to host, and easy to reuse with
 ├── README.md
 ├── index.html              # landing page
 ├── creative-brief.html     # public version of the brief
+├── creative-brief.md       # Markdown version for AI and text clients
+├── llms.txt                # AI-friendly site index
+├── 404.html                # custom GitHub Pages not-found page
 ├── favicon.svg
 ├── investec-logo.svg
 ├── investec-card.png        # alternate card artwork
@@ -64,6 +67,8 @@ The public pages are available at:
 
 - https://investec-developer-community.github.io/ai-ooto/
 - https://investec-developer-community.github.io/ai-ooto/creative-brief.html
+- https://investec-developer-community.github.io/ai-ooto/creative-brief.md
+- https://investec-developer-community.github.io/ai-ooto/llms.txt
 
 ## Why it’s built this way
 
@@ -74,6 +79,7 @@ That makes it a good fit for a short-lived branded prompt experiment where the i
 ## Notes
 
 - The content is static and content-first.
+- The creative brief is available as both HTML and Markdown. GitHub Pages serves static files by URL and does not negotiate a Markdown response based on the `Accept` request header.
 - The experience is meant to be triggered by a user request, not opened passively.
 - The repo is best treated like a lightweight marketing / proof-of-concept asset, not a full product app.
 - On touch-first devices that support sharing files, the primary card action opens the device share sheet with the PNG and instruction (including the public creative brief link). Otherwise it copies both to the clipboard as separate formats, and the receiving app chooses which format to use. Sharing does not continue an existing AI conversation.
