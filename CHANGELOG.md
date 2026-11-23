@@ -14,10 +14,24 @@ sections are development milestones, not formal releases.
 
 ## [Unreleased]
 
+### Added
+
+- Added a Markdown version of the landing page and linked it from the site
+  metadata and AI-friendly site index.
+- Added visible fallback content to the landing page for improved crawling and
+  access when JavaScript is unavailable.
+
 ### Changed
 
 - Made the landing page's primary action copy only the prompt and removed the
   device share-sheet and image-copy actions.
+- Updated the README and AI-friendly site index to describe the simplified
+  prompt-only workflow and Markdown landing-page URL.
+
+### Fixed
+
+- Normalized HTML doctype declarations and void-element syntax across the
+  landing page, creative brief, and custom not-found page.
 
 ## Development history
 
