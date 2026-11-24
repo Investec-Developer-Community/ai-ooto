@@ -18,6 +18,17 @@
   cursor: pointer;
 }
 
+.investec-refined .ref-art {
+  background: #fff;
+}
+
+.investec-refined .ref-artwork,
+.investec-refined .ref-art:hover .ref-artwork {
+  width: min(100%, 400px);
+  margin: 24px auto;
+  transform: none;
+}
+
 .investec-refined .ooto-drag-hint {
   display: none;
 }
