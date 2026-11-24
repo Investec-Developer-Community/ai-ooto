@@ -2,7 +2,7 @@
 
 > For the complete AI-friendly site index, see [llms.txt](https://investec-developer-community.github.io/ai-ooto/llms.txt).
 
-A user-activated AI experience for finding a fresh, useful perspective on the immediately preceding exchange. Viewing this page or its brief does not activate the experience.
+A text-paste-activated AI experience for finding a fresh, useful perspective on the user's selected topic. Viewing this page or its brief does not activate the experience.
 
 To try it, send the creative brief to your AI after an exchange. It asks for one new perspective, why it matters, and a practical next step.
 
