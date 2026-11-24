@@ -23,6 +23,8 @@ sections are development milestones, not formal releases.
 
 ### Changed
 
+- Replaced the landing page's static card hero with a muted, looping campaign
+  video.
 - Made the landing page's primary action copy only the prompt and removed the
   device share-sheet and image-copy actions.
 - Updated the README and AI-friendly site index to describe the simplified

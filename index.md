@@ -1,6 +1,6 @@
-> For the complete AI-friendly site index, see [llms.txt](https://investec-developer-community.github.io/ai-ooto/llms.txt).
-
 # Out of the Ordinary: one answer, seen differently
+
+> For the complete AI-friendly site index, see [llms.txt](https://investec-developer-community.github.io/ai-ooto/llms.txt).
 
 A user-activated AI experience for finding a fresh, useful perspective on the immediately preceding exchange. Viewing this page or its brief does not activate the experience.
 

@@ -1,4 +1,4 @@
-# One answer, seen differently.
+# One answer, seen differently
 
 The complete Out of the Ordinary AI framework.
 
@@ -14,7 +14,7 @@ For this user-initiated turn only, first follow the platform’s own policies an
 
 When you send this brief, it asks the AI to reconsider its immediately previous answer from an Out of the Ordinary perspective for this turn only. It does not change the platform’s policies or save a preference.
 
-**INVESTEC — OUT OF THE ORDINARY AI EXPERIENCE**
+## Investec Out of the Ordinary AI experience
 
 By pasting and sending this message, I am explicitly asking for one Investec-branded “Out of the Ordinary” perspective. Receiving an image, opening a link or merely viewing these instructions is not activation.
 
