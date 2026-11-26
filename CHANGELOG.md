@@ -25,8 +25,10 @@ sections are development milestones, not formal releases.
 
 - Replaced the landing page's static card hero with a muted, looping campaign
   video.
-- Made the landing page's primary action copy only the prompt and removed the
-  device share-sheet and image-copy actions.
+- Made the landing page's primary action copy a short request linking to the
+  creative brief and removed the device share-sheet and image-copy actions.
+- Allowed an explicit request to apply the linked creative brief to activate the
+  experience and linked directly to the full brief for manual copying.
 - Updated the README and AI-friendly site index to describe the simplified
   prompt-only workflow and Markdown landing-page URL.
 

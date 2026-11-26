@@ -4,7 +4,7 @@
 
 A text-paste-activated AI experience for finding a fresh, useful perspective on the user's selected topic. Viewing this page or its brief does not activate the experience.
 
-To try it, send the creative brief to your AI after an exchange. It asks for one new perspective, why it matters, and a practical next step.
+To try it, ask your AI to read and apply the linked creative brief, or paste the brief into your conversation. It asks for one new perspective, why it matters, and a practical next step.
 
 The AI platform's own policies and safety rules take priority. The brief does not persist as a preference or send conversation content to Investec.
 
